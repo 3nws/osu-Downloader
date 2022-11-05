@@ -21,7 +21,7 @@ In this section all the script's commands and arguments will be explained.
 $ ./downloader.py favs [PLAYER_ID] [SOME_DIR]
 ```
 
-This is the command used to download favourite beatmaps of a player from the beatconnect and chimu mirrors. It will download up to a hundred beatmaps from the favourite list.
+This is the command used to download favourite beatmaps of a player from the beatconnect and chimu mirrors. It will download up to a hundred beatmaps from the favourites list.
 
 It will show download progress in the terminal.
 
