@@ -15,6 +15,19 @@ possible with downloads via direct.
 
 In this section all the script's commands and arguments will be explained.
 
+### download player favourites
+
+```
+$ ./downloader.py favs [PLAYER_ID] [SOME_DIR]
+```
+
+This is the command used to download favourite beatmaps of a player from the beatconnect and chimu mirrors. It will dowload up to a hundred beatmaps from the favourite list.
+
+It will show download progress in the terminal.
+
+Requires client_id and secret. [See](https://osu.ppy.sh/home/account/edit#new-oauth-application).
+
+
 ### query
 
 ```

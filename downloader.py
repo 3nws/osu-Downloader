@@ -10,6 +10,8 @@ import time
 from osu_web_connection import *
 from query import *
 from beatmap import *
+from beatmapset import *
+from config import *
 
 def query_osusearch(query):
     beatmap_list = []
@@ -72,9 +74,14 @@ def build_query(args):
     return query
 
 
-def read_beatmap_list(file_name):
+def read_beatmap_list(file_name, **kwargs):
     beatmap_list = []
-    if os.path.isfile(file_name):
+    json_ = kwargs.pop("json", None)
+    if json_ is not None:
+        for beatmap in json_:
+            b = BeatmapSet().build_from_query(beatmap)
+            beatmap_list.append(b)
+    elif os.path.isfile(file_name):
         with open(file_name) as f:
             lines = f.readlines()
             for l in lines:
@@ -153,6 +160,43 @@ def download_beatmap_list(download_list, download_dir):
         print(str(counter) + "/" + str(len(not_downloaded)) + " downloaded")
     conn.close()
 
+class CredentialsError(Exception):
+    pass
+
+def read_favourites(player):
+    sess = requests.Session()
+    res = sess.post("https://osu.ppy.sh/oauth/token", json={
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "grant_type": "client_credentials",
+        "scope": "public",
+    })
+    token = None
+    try:
+        token = res.json()["access_token"]
+    except KeyError:
+        raise CredentialsError("Please check your credentials!")
+    url = f"https://osu.ppy.sh/api/v2/users/{player}/beatmapsets/favourite?limit=100"
+    sess.headers.update({
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    })
+    res = sess.get(url)
+    maps = res.json()
+    return read_beatmap_list(None, json=maps)
+
+
+def download_favourites(player, download_dir):
+    conn = OsuWebConnection(validate=False)
+    abs_path = os.path.abspath(download_dir)
+    stored_results = read_favourites(player)
+    counter = 0
+    for b in stored_results:
+        conn.download_beatmap(b, abs_path)
+        counter += 1
+        print(str(counter) + "/" + str(len(stored_results)) + " downloaded")
+    conn.close()
 
 def main(args):
     if args[0] == "query":
@@ -172,6 +216,8 @@ def main(args):
             print("Error: download directory not found")
             exit(1)
         download_beatmap_list("__query_results.txt", args[1])
+    elif args[0] == "favs":
+        download_favourites(args[1], args[2])
 
 
 
