@@ -15,7 +15,7 @@ possible with downloads via direct.
 
 In this section all the script's commands and arguments will be explained.
 
-### download player favourites
+### favs
 
 ```
 $ ./downloader.py favs [PLAYER_ID] [SOME_DIR]
